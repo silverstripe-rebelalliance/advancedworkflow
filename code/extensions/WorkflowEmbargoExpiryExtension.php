@@ -6,6 +6,9 @@ use SilverStripe\ORM\DataQuery;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+
 
 // Queued jobs descriptor is required for this extension
 if (!class_exists('QueuedJobDescriptor')) {

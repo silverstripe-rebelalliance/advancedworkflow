@@ -2,6 +2,8 @@
 
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
+
 
 /**
  * @author marcus@silverstripe.com.au
