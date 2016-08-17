@@ -852,7 +852,7 @@ class WorkflowFutureStateTest extends FunctionalTest
             'ParentID' => 0
         );
         Config::inst()->update('SilverStripe\\Admin\\LeftAndMain', 'tree_class', 'SilverStripe\\CMS\\Model\\SiteTree');
-        $response = $this->post('LeftAndMain/savetreenode', $data);
+        $response = $this->post('admin/pages/savetreenode', $data);
         $this->assertEquals(200, $response->getStatusCode());
 
         // New sort order is correctly reflecting changes
