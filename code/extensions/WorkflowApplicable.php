@@ -4,6 +4,8 @@ use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\Admin\CMSPreviewable;
+
 
 /**
  * DataObjects that have the WorkflowApplicable extension can have a

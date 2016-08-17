@@ -2,6 +2,8 @@
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
+use SilverStripe\Admin\LeftAndMainExtension;
+
 
 /**
  * Handles interactions triggered by users in the backend of the CMS. Replicate this

@@ -132,7 +132,7 @@ class WorkflowDefinitionExporter {
 	private function ssVersion() {
 		// Remove colons so they don't screw with YAML parsing
 		$versionSapphire = str_replace(':', '', singleton('SapphireInfo')->Version());
-		$versionLeftMain = str_replace(':', '', singleton('LeftAndMain')->CMSVersion());
+		$versionLeftMain = str_replace(':', '', singleton('SilverStripe\\Admin\\LeftAndMain')->CMSVersion());
 		if($versionSapphire != _t('LeftAndMain.VersionUnknown')) {
 			return $versionSapphire;
 		}
