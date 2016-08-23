@@ -636,7 +636,11 @@ class WorkflowEmbargoExpiryExtension extends DataExtension {
 
             foreach ($query->getFrom() as $alias => $join) {
 
-                if (!class_exists($alias) || !is_a($alias, $baseTable, true)) {
+                $aliasClass = DataObject::getSchema()->tableClass($alias);
+                if (!class_exists($aliasClass)
+                    || !is_a($aliasClass, $baseClass, true)
+                    || !DB::get_schema()->hasTable($alias . '_versions')
+                ) {
                     continue;
                 }
 
