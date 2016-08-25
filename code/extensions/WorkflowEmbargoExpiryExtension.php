@@ -8,6 +8,7 @@ use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\CMS\Model\VirtualPage;
 
 // Queued jobs descriptor is required for this extension
 if (!class_exists('QueuedJobDescriptor')) {
@@ -617,6 +618,54 @@ class WorkflowEmbargoExpiryExtension extends DataExtension {
     }
 
     /**
+     * Check if we are currently requesting a virtual page. Virtual pages are a special case as their embargo/expiry relies
+     * on the source page they point to. We need to avoid augmenting the SQL for virtual pages, in the first instance when
+     * the page is requested the only information we have is the URLSegment (@see ModelAsController::getNestedController())
+     * so this method finds all URLSegments for virtual pages and does a comparison.
+     *
+     * @param  SQLSelect $query
+     * @param  DataQuery $dataQuery
+     * @return boolean              True if page requested is a virtual
+     */
+    private function requestingVirtual($query, $dataQuery)
+    {
+        // Special casing for Virtual pages, if we are getting a SiteTree object it might be a virtual page, which does
+        // not have the embargo fields set correctly so we need to avoid getting future state for this object
+        $baseClass = DataObject::getSchema()->baseDataClass($dataQuery->dataClass());
+        $baseTable = DataObject::getSchema()->baseDataTable($baseClass);
+
+        if ($baseTable == 'SiteTree') {
+
+            // Get the URL segment from the query
+            $where = $query->getWhere();
+            $segment = null;
+            if ($where) foreach ($where as $key => $val) {
+                if (isset($val['"SiteTree"."URLSegment" = ?'][0])) {
+                    $segment = $val['"SiteTree"."URLSegment" = ?'][0];
+                }
+            }
+
+            if ($segment) {
+                $classes = array_keys(ClassInfo::subclassesFor('SilverStripe\\CMS\\Model\\VirtualPage'));
+                $result = DB::prepared_query("
+                    SELECT \"URLSegment\"
+                    FROM \"SiteTree\"
+                    WHERE \"ClassName\" IN (" . DB::placeholders($classes) . ")",
+                    $classes
+                );
+
+                if ($result && $result->numRecords()) {
+                    $segments = $result->column();
+                    if (in_array($segment, $segments)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Alter SQL queries for this object so that the version matching the time that is passed is returned.
      * Relies on Versioned extension as it queries the _versions table and is only triggered when viewing the staging
      * site e.g: ?stage=Stage. This has the side effect that Versioned::canViewVersioned() is used to restrict
@@ -625,7 +674,11 @@ class WorkflowEmbargoExpiryExtension extends DataExtension {
     public function augmentSQL(SQLSelect $query, DataQuery $dataQuery = null) {
         $time = $dataQuery->getQueryParam('Future.time');
 
-        if (!$time || !$this->owner->has_extension('SilverStripe\\ORM\\Versioning\\Versioned')) {
+        if (!$time
+            || !$this->owner->has_extension('SilverStripe\\ORM\\Versioning\\Versioned')
+            || $this->owner instanceof VirtualPage
+            || $this->requestingVirtual($query, $dataQuery)
+        ) {
             return;
         }
 
