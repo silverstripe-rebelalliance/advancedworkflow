@@ -34,11 +34,21 @@ class FutureStatePreviewField extends DatetimeField
     }
 
     /**
-     * do not need to make this readonly
-     * @return $this
+     * Prevent readonly transformation for this field
+     *
+     * @return FutureStatePreviewField
      */
     public function performReadonlyTransformation()
     {
+        return $this;
+    }
+
+    /**
+     * Prevent readonly for this field.
+     *
+     * @return FutureStatePreviewField
+     */
+    public function setReadonly($bool) {
         return $this;
     }
 
