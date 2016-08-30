@@ -330,8 +330,8 @@ class WorkflowEmbargoExpiryExtension extends DataExtension {
      */
     public function updateStatusFlags(&$flags)
     {
-        $embargo = $this->getIsPublishScheduled();
-        $expiry = $this->getIsUnPublishScheduled();
+        $embargo = $this->owner->getIsPublishScheduled();
+        $expiry = $this->owner->getIsUnPublishScheduled();
 
         if ($embargo || $expiry) {
             unset($flags['addedtodraft'], $flags['modified']);
