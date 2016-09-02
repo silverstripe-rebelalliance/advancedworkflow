@@ -680,7 +680,7 @@ class WorkflowEmbargoExpiryExtension extends DataExtension {
             $where = $query->getWhere();
             $segment = null;
             if ($where) foreach ($where as $key => $val) {
-                if (isset($val['"SiteTree"."URLSegment" = ?'][0])) {
+                if (is_array($val) && isset($val['"SiteTree"."URLSegment" = ?'][0])) {
                     $segment = $val['"SiteTree"."URLSegment" = ?'][0];
                 }
             }
